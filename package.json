@@ -1,8 +1,6 @@
 {
   "name": "ticket-app-server",
-  "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@babel/core": "^7.16.0",
@@ -24,7 +22,6 @@
     "browserslist": "^4.18.1",
     "camelcase": "^6.2.1",
     "case-sensitive-paths-webpack-plugin": "^2.4.0",
-    "cjs-loader": "^0.1.0",
     "constants-browserify": "^1.0.0",
     "cors": "^2.8.5",
     "css-loader": "^6.5.1",
@@ -80,11 +77,7 @@
     "workbox-webpack-plugin": "^6.4.1"
   },
   "scripts": {
-    "start": "node server.js",
-    "build": "node scripts/build.js",
-    "test": "node scripts/test.js",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "start": "node server.js"
   },
   "proxy": "http://localhost:5000",
   "eslintConfig": {
@@ -92,6 +85,9 @@
       "react-app",
       "react-app/jest"
     ]
+  },
+  "engines": {
+    "node": "16.14.2"
   },
   "browserslist": {
     "production": [
