@@ -32,6 +32,6 @@ mongoose
     useUnifiedTopology: true
   })
   .then(res => {
-    app.listen(process.env.PORT_SERVER, () => console.log("server is up"))
+    app.listen(process.env.PORT || process.env.PORT_SERVER || 5000, () => console.log("server is up"))
   })
   .catch(err => console.log(err))
