@@ -29,12 +29,13 @@ router.post("/posts/new", verifyJWT, async (req, res) => {
     user: user.id,
     name: user.username,
     numberOfLikes: 0,
-    hasUserLiked: null
+    hasUserLiked: [],
+    hasUserFollowed: []
   })
   /* sets posts on USER model */
   const relatedUser = await User.findById(userId)
   relatedUser.posts.push(dbPost)
-
+  /* save to db */
   relatedUser.save(function (err) {
     if (err) {
       console.log(err)
@@ -85,7 +86,9 @@ router.put("/posts/:id", verifyJWT, async (req, res) => {
     const comment = await Comments.findById(id)
 
     console.log(comment)
-  } catch (error) {}
+  } catch (error) {
+    console.log(error)
+  }
 })
 
 /* Update Post Likes */
@@ -154,6 +157,88 @@ router.get("/posts/:id/hasUserLiked", verifyJWT, async (req, res) => {
   }
 })
 
+/* Follow Post */
+router.post("/posts/:id/follow", verifyJWT, async (req, res) => {
+  console.log("updating follow...")
+  const id = req.params.id
+  const body = req.body
+  const hasUserFollowed = req.body.hasUserFollowed
+  const userId = req.user.id
+
+  console.log("hasUserFollowed :" + hasUserFollowed)
+  console.log("body :" + body)
+  console.log("id :" + id)
+  /* find id of user that is following. and then update it with post id */
+  try {
+    /* query db */
+    const user = await User.findById({ _id: body.hasUserFollowed })
+    const post = await Post.findById({ _id: id })
+
+    console.log(user)
+    console.log(post)
+
+    /* push to db */
+    user.hasPostFollowed.push(id)
+    post.hasUserFollowed.push(hasUserFollowed)
+
+    /* save to db */
+    user.save(function (err) {
+      if (err) {
+        console.log(err)
+      }
+    })
+    post.save(function (err) {
+      if (err) {
+        console.log(err)
+      }
+    })
+    console.log("user: " + user)
+    console.log("post: " + post)
+  } catch (error) {
+    console.log(error)
+  }
+})
+/* Unfollow Post */
+router.put("/posts/:id/unfollow", verifyJWT, async (req, res) => {
+  console.log("updating unfollow...")
+  const id = req.params.id
+  const userIdFromBody = req.body
+  const userId = req.user.id
+  const hasPostFollowed = { hasPostFollowed: id }
+
+  /*  */
+  console.log("body :" + userIdFromBody)
+  console.log("id :" + id)
+  console.log("userId :" + userId)
+
+  try {
+    /* $pull the  */
+    const postafterdelete = await Post.updateOne({ _id: id }, { $pull: userIdFromBody }).exec()
+    const userAfterDelete = await User.updateOne({ _id: userId }, { $pull: hasPostFollowed }).exec()
+
+    /* no need to save after $pull */
+
+    console.log("postafterdelete :" + postafterdelete)
+    console.log("userAfterDelete :" + userAfterDelete)
+  } catch (error) {
+    console.log(error)
+  }
+})
+/* get if user had followed */
+router.get("/posts/:id/followcheck", verifyJWT, async (req, res) => {
+  console.log("checking if user follows...")
+  console.log("Still running")
+  const id = req.params.id
+  console.log(id)
+
+  try {
+    const post = await Post.findById({ _id: id })
+    res.json(post.hasUserFollowed)
+  } catch (error) {
+    console.log(error)
+  }
+})
+
 /* Delete Post */
 router.delete("/posts/:id", verifyJWT, async (req, res) => {
   /* find post by id > delete post */
@@ -162,11 +247,11 @@ router.delete("/posts/:id", verifyJWT, async (req, res) => {
   console.log(id)
 
   try {
-    /* if comments attached to post delete comments */
-
-    await Post.deleteOne({ _id: id })
+    /*TODO: if comments attached to post delete comments */
 
     const post = await Post.findById(id)
+    console.log(post)
+    await Post.deleteOne({ _id: id })
 
     console.log("post deleted")
     return res.json(post)
@@ -260,6 +345,15 @@ router.put("/posts/:id/comments", async (req, res) => {
 
     console.log(comment)
   } catch (error) {}
+})
+
+router.get("/posts/:user/following", async (req, res) => {
+  console.log("Get posts user is following")
+  const id = req.params.user
+
+  const userIsFollowingPost = await User.findById({ _id: id }).populate("hasPostFollowed")
+  console.log(userIsFollowingPost.hasPostFollowed)
+  res.json(userIsFollowingPost.hasPostFollowed)
 })
 
 /* ! GET REQUEST FOR COMMENTS */

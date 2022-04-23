@@ -35,10 +35,23 @@ const postSchema = mongoose.Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
       }
+    ],
+    typeOf: {
+      type: "String",
+      default: "Post"
+    },
+    hasUserFollowed: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+      }
     ]
   },
   { timestamps: true }
 )
+
+/* search functionality */
+postSchema.index({ title: "text", description: "text" })
 
 /* delete all the comments */
 postSchema.pre("deleteOne", function (next) {

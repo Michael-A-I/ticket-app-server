@@ -39,6 +39,12 @@ const userSchema = mongoose.Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: "Post"
       }
+    ],
+    hasPostFollowed: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post"
+      }
     ]
   },
   { timestamps: true }
@@ -49,3 +55,5 @@ const User = mongoose.model("User", userSchema)
 module.exports = User
 
 /* delete users from db and recreate with posts/comments */
+
+/* when a object added to any of theses fields then notification should be sent with the object id.  */
