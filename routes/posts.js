@@ -8,9 +8,10 @@ const Post = require("../models/post")
 const Comments = require("../models/comments")
 const verifyJWT = require("../verifyJWT")
 const User = require("../models/user")
+const Answers = require("../models/answers")
 
 router.post("/posts/new", verifyJWT, async (req, res) => {
-  // console.log(req.body)
+  console.log("/posts/new")
 
   const post = req.body
   const user = req.user
@@ -18,7 +19,8 @@ router.post("/posts/new", verifyJWT, async (req, res) => {
 
   console.table([
     ["username", user.username],
-    ["id", user.id]
+    ["id", user.id],
+    ["file ", post.file]
   ])
 
   console.log("USERNAME TYPEOF " + typeof user.username)
@@ -30,7 +32,9 @@ router.post("/posts/new", verifyJWT, async (req, res) => {
     name: user.username,
     numberOfLikes: 0,
     hasUserLiked: [],
-    hasUserFollowed: []
+    hasUserFollowed: [],
+    image: post.file,
+    category: post.category
   })
   /* sets posts on USER model */
   const relatedUser = await User.findById(userId)
@@ -53,6 +57,35 @@ router.post("/posts/new", verifyJWT, async (req, res) => {
 
 router.get("/posts/index", verifyJWT, async (req, res) => {
   const post = await Post.find({})
+  console.log("trying to send data to front end")
+
+  // console.log(res.json)
+  return res.json(post)
+})
+router.get("/posts/support", verifyJWT, async (req, res) => {
+  const post = await Post.find({ category: "Support" })
+  console.log("trying to send data to front end")
+
+  // console.log(res.json)
+  return res.json(post)
+})
+/* filters */
+router.get("/posts/product", verifyJWT, async (req, res) => {
+  const post = await Post.find({ category: "Product" })
+  console.log("trying to send data to front end")
+
+  // console.log(res.json)
+  return res.json(post)
+})
+router.get("/posts/general", verifyJWT, async (req, res) => {
+  const post = await Post.find({ category: "General" })
+  console.log("trying to send data to front end")
+
+  // console.log(res.json)
+  return res.json(post)
+})
+router.get("/posts/engineer", verifyJWT, async (req, res) => {
+  const post = await Post.find({ category: "Engineer" })
   console.log("trying to send data to front end")
 
   // console.log(res.json)
@@ -310,6 +343,7 @@ router.get("/posts/:id/comments", verifyJWT, async (req, res) => {
   }
 })
 
+/* Delete Comment */
 router.delete("/posts/:id/comments", verifyJWT, async (req, res) => {
   let id = req.params.id
 
@@ -329,7 +363,7 @@ router.delete("/posts/:id/comments", verifyJWT, async (req, res) => {
 
 /* Edit Comment */
 router.put("/posts/:id/comments", async (req, res) => {
-  console.log("updating...")
+  console.log("updating comment...")
   const id = req.params.id
   const body = req.body
   console.log(id)
@@ -344,7 +378,9 @@ router.put("/posts/:id/comments", async (req, res) => {
     const comment = await Comments.findById(id)
 
     console.log(comment)
-  } catch (error) {}
+  } catch (error) {
+    console.log(error)
+  }
 })
 
 router.get("/posts/:user/following", async (req, res) => {
@@ -354,6 +390,139 @@ router.get("/posts/:user/following", async (req, res) => {
   const userIsFollowingPost = await User.findById({ _id: id }).populate("hasPostFollowed")
   console.log(userIsFollowingPost.hasPostFollowed)
   res.json(userIsFollowingPost.hasPostFollowed)
+})
+/* Answers */
+
+/* Get Answers */
+router.get("/posts/:id/answers", async (req, res) => {
+  console.log("Get Answers")
+  const id = req.params.id
+
+  /* Get post then populate answers */
+  const answers = await Post.findById(id).populate("answers")
+
+  console.log("server: " + answers)
+  res.json(answers)
+})
+
+/* Post Answers */
+router.post("/posts/:id/answers", verifyJWT, async (req, res) => {
+  console.log("Post Answers")
+  /* Post Answer to Database */
+  const id = req.params.id
+  const answer = req.body
+
+  const user = req.user
+  // console.log(user)
+  const userId = user.id
+
+  const post = await Post.findById(id)
+
+  /* creates relationshipt between single comment and the single post */
+  const dbAnswers = new Answers({
+    text: answer.text,
+    post: id,
+    postName: post.title,
+    user: user.id,
+    name: user.username,
+    comments: []
+  })
+  dbAnswers.save()
+  /* this creates relationsip between post and many answers */
+  const relatedPost = await Post.findById(id)
+  relatedPost.answers.push(dbAnswers)
+  /* this creats a relationship to the user and many answers */
+  const relatedUser = await User.findById(userId)
+  relatedUser.answers.push(dbAnswers)
+
+  await relatedPost.save(function (err) {
+    if (err) {
+      console.log(err)
+    }
+  })
+
+  await relatedUser.save(function (err) {
+    if (err) {
+      console.log(err)
+    }
+  })
+
+  res.json({ message: "Success" })
+})
+
+/* Answer Comments */
+
+router.post("/posts/:post/answer/:comment", verifyJWT, async (req, res) => {
+  console.log("Post Answer Comment")
+  const postID = req.params.post
+  const commentID = req.params.comment
+  const comments = req.body
+  const user = req.user
+  const userId = user.id
+
+  const post = await Post.findById(postID)
+
+  /* creates relationshipt between single comment and the single post */
+  const dbComments = new Comments({
+    text: comments.text,
+    post: postID,
+    postName: post.title,
+    user: user.id,
+    name: user.username,
+    answer: commentID
+  })
+  dbComments.save()
+
+  /* create a relationship between comment and post */
+  const relatedAnswer = await Answers.findById(commentID)
+  relatedAnswer.comments.push(dbComments)
+  console.log("relatedAnswer :" + relatedAnswer)
+  console.log("CommentID " + commentID)
+
+  /* this creats a relationship to the user and many comments */
+  const relatedUser = await User.findById(userId)
+  relatedUser.comments.push(dbComments)
+
+  await relatedAnswer.save(function (err) {
+    if (err) {
+      console.log(err)
+    }
+  })
+  await relatedUser.save(function (err) {
+    if (err) {
+      console.log(err)
+    }
+  })
+
+  res.json({ message: "Success" })
+})
+
+/* Get Answers Comments*/
+
+// router.get("/posts/answers/:id", verifyJWT, async (req, res) => {
+//   console.log("Get Answers Comments")
+//   const id = req.params.id
+
+//   const answers = await Answers.findById( id ).populate("comments")
+//   console.log(answers)
+//   // res.json(answers)
+// })
+
+router.get("/posts/answers/:id", verifyJWT, async (req, res) => {
+  console.log("Get Array of Answers IDs from Post")
+  const id = req.params.id
+
+  // console.log(id)
+  const postAnswerIds = await Post.findById(id).select("answers")
+
+  /* returns answers from post */
+  console.log("GET ARRAY OF ANSWER IDS FROM POST " + postAnswerIds.answers)
+
+  const answers = await Answers.find().where("_id").in(postAnswerIds.answers).populate("comments")
+
+  // const answers = await Answers.findById(id).populate("comments")
+  console.log("GET ARRAY OF ANSWER IDS FROM POST RESPONSE " + answers)
+  res.json(answers)
 })
 
 /* ! GET REQUEST FOR COMMENTS */

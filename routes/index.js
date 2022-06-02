@@ -14,7 +14,7 @@ router.get("/", (req, res) => {
 })
 
 router.post("/register", async (req, res) => {
-  console.log("prxy")
+  console.log("register")
 
   const user = req.body
 
@@ -72,7 +72,11 @@ router.post("/login", (req, res) => {
             return res.json({
               message: "Success",
               token: "Bearer " + token,
-              user: dbUser.username
+              user: dbUser.username,
+              id: dbUser.id,
+              avatar: null,
+              email: dbUser.email,
+              created: dbUser.createdAt
             })
           }
         )

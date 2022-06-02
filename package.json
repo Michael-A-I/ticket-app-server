@@ -1,5 +1,5 @@
 {
-  "name": "ticket-app-server",
+  "name": "server",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -46,6 +46,7 @@
     "momment": "^0.0.1",
     "mongoose": "^6.2.6",
     "mongoose-deep-populate": "^3.2.0",
+    "multer": "^1.4.5-lts.1",
     "node-polyfill-webpack-plugin": "^1.1.4",
     "postcss": "^8.4.4",
     "postcss-flexbugs-fixes": "^5.0.2",

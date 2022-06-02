@@ -2,21 +2,30 @@ const mongoose = require("mongoose")
 
 const postSchema = mongoose.Schema(
   {
-    title: {
+    category: {
       type: String,
-      required: true
+      required: true,
+      enum: ["General", "Engineer", "Product", "Support"],
+      default: "General"
+    },
+    file: {
+      type: String
+      // required: true
     },
     description: {
       type: String,
       required: true
     },
-    image: {
-      type: String
-    },
     comments: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Comments"
+      }
+    ],
+    answers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Answers"
       }
     ],
     user: {

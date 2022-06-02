@@ -28,6 +28,12 @@ const userSchema = mongoose.Schema(
         ref: "Comments"
       }
     ],
+    answers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Answers"
+      }
+    ],
     likedPosts: [
       {
         type: mongoose.Schema.Types.ObjectId,

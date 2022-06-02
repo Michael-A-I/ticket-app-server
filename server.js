@@ -9,8 +9,6 @@ const cors = require("cors")
 
 const index = require("./routes/index")
 const posts = require("./routes/posts")
-const user = require("./routes/user")
-const search = require("./routes/search")
 
 const app = express()
 app.use(cors())
@@ -23,9 +21,7 @@ const dbURI = process.env.URI
 /* routes */
 
 app.use("/", index)
-app.use("/", search)
 app.use("/", posts)
-app.use("/", user)
 
 console.log(process.env.PORT_SERVER)
 /* Connect to MongDB database */
