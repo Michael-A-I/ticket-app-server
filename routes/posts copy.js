@@ -58,58 +58,56 @@ router.post("/posts/new", verifyJWT, async (req, res) => {
 })
 
 router.get("/posts/index", verifyJWT, async (req, res) => {
-  console.log("/posts/index")
+  const post = await Post.find({})
+  console.log("trying to send data to front end")
 
-  /* Speed increase due to not loading image and using lean */
-  const post = await Post.find({}).select("-file").lean()
-
-  console.log(post)
+  // console.log(res.json)
   return res.json(post)
 })
 router.get("/posts/support", verifyJWT, async (req, res) => {
-  console.log("/posts/support")
   const post = await Post.find({ category: "Support" })
+  console.log("trying to send data to front end")
 
   // console.log(res.json)
   return res.json(post)
 })
 /* filters */
 router.get("/posts/product", verifyJWT, async (req, res) => {
-  console.log("/posts/product")
   const post = await Post.find({ category: "Product" })
+  console.log("trying to send data to front end")
 
   // console.log(res.json)
   return res.json(post)
 })
 router.get("/posts/general", verifyJWT, async (req, res) => {
-  console.log("/posts/general")
   const post = await Post.find({ category: "General" })
+  console.log("trying to send data to front end")
 
   // console.log(res.json)
   return res.json(post)
 })
 router.get("/posts/engineer", verifyJWT, async (req, res) => {
-  console.log("/posts/engineer")
   const post = await Post.find({ category: "Engineer" })
+  console.log("trying to send data to front end")
 
+  // console.log(res.json)
   return res.json(post)
 })
 
 router.get("/posts/:id", verifyJWT, async (req, res) => {
-  console.log("/posts/:id")
-
+  // console.log(typeof req.params.id)
   let paramsId = req.params.id
   const post = await Post.findById({ _id: `${paramsId}` })
     .populate("user")
-    .lean()
     .exec()
 
+  // console.log(res.json(post))
   return res.json(post)
 })
 
 /*! Update Post */
 router.put("/posts/:id", verifyJWT, async (req, res) => {
-  console.log("/posts/:id")
+  console.log("updating...")
   const id = req.params.id
   const body = req.body
   // console.log(id)
@@ -122,17 +120,17 @@ router.put("/posts/:id", verifyJWT, async (req, res) => {
     // console.log("error" + error)
   }
 
-  /* try {
+  try {
     const comment = await Comments.findById(id)
 
     // console.log(comment)
   } catch (error) {
     // console.log(error)
-  } */
+  }
 })
 
 router.put("/posts/:id/edit", verifyJWT, async (req, res) => {
-  console.log("/posts/:id/edit")
+  console.log("updating...")
   const id = req.params.id
   const body = req.body
   console.log(id)
@@ -156,7 +154,7 @@ router.put("/posts/:id/edit", verifyJWT, async (req, res) => {
 
 /* Update Post Likes */
 router.put("/posts/:id/like", verifyJWT, async (req, res) => {
-  console.log("/posts/:id/like")
+  console.log("updating likes...")
   const id = req.params.id
   const body = req.body
   const userId = req.user.id
@@ -186,7 +184,7 @@ router.put("/posts/:id/like", verifyJWT, async (req, res) => {
 
 /* BL */
 router.put("/posts/:id/unlike", verifyJWT, async (req, res) => {
-  console.log("/posts/:id/unlike")
+  console.log("updating unlike...")
   const id = req.params.id
   const body = req.body
   const userId = req.user.id
@@ -216,7 +214,7 @@ router.put("/posts/:id/unlike", verifyJWT, async (req, res) => {
 /* has user liked? */
 
 router.get("/posts/:id/hasUserLiked", verifyJWT, async (req, res) => {
-  console.log("/posts/:id/hasUserLiked")
+  console.log("hasUserLiked")
   const userID = req.user.id
   const id = req.params.id
 
@@ -243,7 +241,7 @@ router.get("/posts/:id/hasUserLiked", verifyJWT, async (req, res) => {
 /* Follow Post */
 /* BLOCKING */
 router.post("/posts/:id/follow", verifyJWT, async (req, res) => {
-  console.log("/posts/:id/follow")
+  console.log("updating follow...")
   const id = req.params.id
   const body = req.body
   const hasUserFollowed = req.body.hasUserFollowed
@@ -285,7 +283,7 @@ router.post("/posts/:id/follow", verifyJWT, async (req, res) => {
 /* Unfollow Post */
 /* Blocks */
 router.put("/posts/:id/unfollow", verifyJWT, async (req, res) => {
-  console.log("/posts/:id/unfollow")
+  console.log("updating unfollow...")
   const id = req.params.id
   const userIdFromBody = req.body
   const userId = req.user.id
@@ -314,14 +312,15 @@ router.put("/posts/:id/unfollow", verifyJWT, async (req, res) => {
 })
 /* get if user had followed */
 router.get("/posts/:id/followcheck", verifyJWT, async (req, res) => {
-  console.log("/posts/:id/followcheck")
-
+  console.log("checking if user follows...")
+  console.log("Still running")
   const id = req.params.id
   // console.log(id)
 
   try {
     const post = await Post.findById({ _id: id })
     // check if user has follwed
+    console.log("check followed")
 
     /* post.hasUserFollowed is array of user ids */
 
@@ -336,8 +335,10 @@ router.get("/posts/:id/followcheck", verifyJWT, async (req, res) => {
 /* Delete Post */
 /* BLOCKING */
 router.delete("/posts/:id", verifyJWT, async (req, res) => {
-  console.log("/posts/:id")
+  /* find post by id > delete post */
   let id = req.params.id
+
+  // console.log(id)
 
   try {
     /*TODO: if comments attached to post delete comments */
@@ -355,19 +356,14 @@ router.delete("/posts/:id", verifyJWT, async (req, res) => {
   }
 })
 
-/* Post Comment */
-
+/* BLOCKING */
 router.post("/posts/:id/comments", verifyJWT, async (req, res) => {
-  console.time("getUploadRead")
-
-  console.log("/posts/:id/comments")
   const comments = req.body
   const id = req.params.id
   const user = req.user
   const userId = user.id
 
-  const post = await Post.findById(id).select("title").lean()
-  console.log(post)
+  const post = await Post.findById(id)
 
   /* creates relationshipt between single comment and the single post */
   const dbComments = new Comments({
@@ -379,39 +375,32 @@ router.post("/posts/:id/comments", verifyJWT, async (req, res) => {
   })
   dbComments.save()
   /* this creates relationsip between post and many comments */
-  const relatedPost = Post.findById(id)
+  const relatedPost = await Post.findById(id)
   /* this creats a relationship to the user and many comments */
-  const relatedUser = User.findById(userId)
+  const relatedUser = await User.findById(userId)
 
-  const [relatedPostResponse, relatedUserResponse] = await Promise.all([relatedPost, relatedUser])
+  relatedPost.comments.push(dbComments)
+  relatedUser.comments.push(dbComments)
 
-  relatedPostResponse.comments.push(dbComments)
-  relatedUserResponse.comments.push(dbComments)
-
-  relatedPostResponse.save(function (err) {
+  relatedPost.save(function (err) {
     if (err) {
       // console.log(err)
     }
   })
-  relatedUserResponse.save(function (err) {
+  relatedUser.save(function (err) {
     if (err) {
       // console.log(err)
     }
   })
 
   res.json({ message: "Success" })
-  console.timeEnd("getUploadRead")
 })
 
-/* GET Comment */
 router.get("/posts/:id/comments", verifyJWT, async (req, res) => {
-  console.time("GET /posts/:id/comments")
-  console.log("/posts/:id/comments")
   let id = req.params.id
+  // console.log(typeof id)
   /* Deep populate */
-  const post = await Post.findById(id)
-    .populate({ path: "comments", populate: { path: "user" } })
-    .lean()
+  const post = await Post.findById(id).populate({ path: "comments", populate: { path: "user" } })
   // const post = await Post.findById(id).populate("comments")
 
   // console.log(post)
@@ -423,16 +412,14 @@ router.get("/posts/:id/comments", verifyJWT, async (req, res) => {
   } else {
     res.json({ message: "404" })
   }
-  console.timeEnd("GET /posts/:id/comments")
 })
 
 /* Delete Comment */
 /* BLOCKING */
 router.delete("/posts/:id/comments", verifyJWT, async (req, res) => {
-  console.time("delete /posts/:id/comments")
-
-  console.log("/posts/:id/comments")
   let id = req.params.id
+
+  // console.log(id)
 
   try {
     await Comments.deleteOne({ _id: id })
@@ -442,14 +429,13 @@ router.delete("/posts/:id/comments", verifyJWT, async (req, res) => {
     console.log("comment deleted")
     return res.json(comments)
   } catch (error) {
-    console.log(error)
+    // console.log(error)
   }
-  console.timeEnd("delete /posts/:id/comments")
 })
 
 /* Edit Comment */
-router.put("/posts/:id/comments", verifyJWT, async (req, res) => {
-  console.log("/posts/:id/comments")
+router.put("/posts/:id/comments", async (req, res) => {
+  console.log("updating comment...")
   const id = req.params.id
   const body = req.body
   console.log(id)
@@ -469,11 +455,11 @@ router.put("/posts/:id/comments", verifyJWT, async (req, res) => {
   }
 })
 
-router.get("/posts/:user/following", verifyJWT, async (req, res) => {
-  console.log("/posts/:user/following")
+router.get("/posts/:user/following", async (req, res) => {
+  console.log("Get posts user is following")
   const id = req.params.user
 
-  const userIsFollowingPost = await User.findById({ _id: id }).populate("hasPostFollowed").lean()
+  const userIsFollowingPost = await User.findById({ _id: id }).populate("hasPostFollowed")
   console.log(userIsFollowingPost.hasPostFollowed)
   res.json(userIsFollowingPost.hasPostFollowed)
 })
@@ -481,15 +467,13 @@ router.get("/posts/:user/following", verifyJWT, async (req, res) => {
 
 /* Get Answers */
 router.get("/posts/:id/answers", verifyJWT, async (req, res) => {
-  console.log("GET /posts/:id/answers")
+  console.log("Get Answers")
   const id = req.params.id
 
   /* Get post then populate answers */
   /* Deep populate */
 
-  const post = await Post.findById(id)
-    .populate({ path: "answers", populate: { path: "user" } })
-    .lean()
+  const post = await Post.findById(id).populate({ path: "answers", populate: { path: "user" } })
 
   if (post.answers) {
     const answers = post.answers
@@ -498,27 +482,11 @@ router.get("/posts/:id/answers", verifyJWT, async (req, res) => {
     res.json({ message: "404" })
   }
 })
-/* Get Answers */
-
-router.get("/posts/answers/:id", verifyJWT, async (req, res) => {
-  console.log("GET /posts/answers/:id")
-  const id = req.params.id
-
-  const post = await Post.findById(id)
-    .populate({ path: "answers", populate: [{ path: "comments", populate: { path: "user" } }, { path: "user" }] })
-    .lean()
-
-  //!TypeError: Cannot read properties of undefined (reading 'split')
-
-  const answers = await post.answers
-
-  res.json(answers)
-})
 
 /* Post Answers */
 // BLOCKING
 router.post("/posts/:id/answers", verifyJWT, async (req, res) => {
-  console.log("POST /posts/:id/answers")
+  console.log("Post Answers")
   /* Post Answer to Database */
   const id = req.params.id
   const answer = req.body
@@ -540,28 +508,23 @@ router.post("/posts/:id/answers", verifyJWT, async (req, res) => {
   })
   dbAnswers.save()
   /* this creates relationsip between post and many answers */
-  const relatedPost = Post.findById(id)
+  const relatedPost = await Post.findById(id)
+  relatedPost.answers.push(dbAnswers)
   /* this creats a relationship to the user and many answers */
-  const relatedUser = User.findById(userId)
+  const relatedUser = await User.findById(userId)
+  relatedUser.answers.push(dbAnswers)
 
-  const [relatedPostResponse, relatedUserResponse] = await Promise.all([relatedPost, relatedUser])
-
-  relatedPostResponse.answers.push(dbAnswers)
-  relatedUserResponse.answers.push(dbAnswers)
-
-  const postSave = relatedPostResponse.save(function (err) {
+  await relatedPost.save(function (err) {
     if (err) {
       console.log(err)
     }
   })
 
-  const userSave = relatedUserResponse.save(function (err) {
+  await relatedUser.save(function (err) {
     if (err) {
       console.log(err)
     }
   })
-
-  await Promise.all([postSave, userSave])
 
   res.json({ message: "Success" })
 })
@@ -569,7 +532,7 @@ router.post("/posts/:id/answers", verifyJWT, async (req, res) => {
 /* Delete Answers */
 
 router.delete("/posts/:id/answers/delete", verifyJWT, async (req, res) => {
-  console.log("/posts/:id/answers/delete")
+  console.log("delete answer")
   const answerID = req.params.id
 
   const answer = await Answers.findByIdAndDelete(answerID)
@@ -582,7 +545,7 @@ router.delete("/posts/:id/answers/delete", verifyJWT, async (req, res) => {
 /* Edit Answer */
 
 router.put("/posts/:id/answers/edit", verifyJWT, async (req, res) => {
-  console.log("/posts/:id/answers/edit")
+  console.log("edit answer")
 
   // const answer = await Answers.findByIdAndDelete(answerID)
 
@@ -592,6 +555,7 @@ router.put("/posts/:id/answers/edit", verifyJWT, async (req, res) => {
 
   /*! Edit Answers */
 
+  console.log("updating Answer...")
   const answerID = req.params.id
   const body = req.body
 
@@ -602,14 +566,14 @@ router.put("/posts/:id/answers/edit", verifyJWT, async (req, res) => {
 
     return res.json({ message: "success" })
   } catch (error) {
-    console.log(error)
+    // console.log(error)
   }
 })
 
 /* Answer Comments */
 /* BLOCKING */
 router.post("/posts/:post/answer/:comment", verifyJWT, async (req, res) => {
-  console.log("/posts/:post/answer/:comment")
+  console.log("Post Answer Comment")
   const postID = req.params.post
   const commentID = req.params.comment
   const comments = req.body
@@ -627,7 +591,7 @@ router.post("/posts/:post/answer/:comment", verifyJWT, async (req, res) => {
     name: user.username,
     answer: commentID
   })
-  await dbComments.save()
+  dbComments.save()
 
   /* create a relationship between comment and post */
   const relatedAnswer = await Answers.findById(commentID)
@@ -653,6 +617,43 @@ router.post("/posts/:post/answer/:comment", verifyJWT, async (req, res) => {
   res.json({ message: "Success" })
 })
 
+/* Get Answers Comments*/
+
+// router.get("/posts/answers/:id", verifyJWT, async (req, res) => {
+//   console.log("Get Answers Comments")
+//   const id = req.params.id
+
+//   const answers = await Answers.findById( id ).populate("comments")
+//   console.log(answers)
+//   // res.json(answers)
+// })
+
+router.get("/posts/answers/:id", verifyJWT, async (req, res) => {
+  console.log("Get Array of Answers IDs from Post")
+  const id = req.params.id
+
+  // console.log(id)
+  // const postAnswerIds = await Post.findById(id).select("answers")
+  const post = await Post.findById(id).populate({ path: "answers", populate: [{ path: "comments", populate: { path: "user" } }, { path: "user" }] })
+
+  // const answers = await Post.findById(id).populate({ path: "answers", populate: { path: "comments", populate: { path: "user" } } })
+
+  /* returns answers from post */
+  // console.log("GET ARRAY OF ANSWER IDS FROM POST " + postAnswerIds.answers)
+
+  //!TypeError: Cannot read properties of undefined (reading 'split')
+
+  // const answers = await Answers.find()
+  //   .where("_id")
+  //   .in(postAnswerIds.answers)
+  //   .populate({ path: "comments", populate: { path: "user" } })
+
+  const answers = post.answers
+  // const answers = await Answers.findById(id).populate("comments")
+  // console.log("GET ARRAY OF ANSWER IDS FROM POST RESPONSE " + answers)
+  res.json(answers)
+})
+
 router.get("/posts/search/:search", verifyJWT, async (req, res) => {
   console.log("search posts")
 
@@ -669,5 +670,25 @@ router.get("/posts/search/:search", verifyJWT, async (req, res) => {
 
   res.json(results)
 })
+
+/* ! GET REQUEST FOR COMMENTS 
+
+Model
+    .find(
+        { $text : { $search : "text to look for" } }, 
+        { score : { $meta: "textScore" } }
+    )
+    .sort({ score : { $meta : 'textScore' } })
+    .exec(function(err, results) {
+        // callback
+    });
+
+*/
+
+// router.get("/posts/isUserAuth", verifyJWT, (req, res) => {
+//   console.log("prxy")
+
+//   return res.json({ isLoggedIn: true, user: req.user })
+// })
 
 module.exports = router

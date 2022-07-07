@@ -1,12 +1,18 @@
 const mongoose = require("mongoose")
+const mongoosastic = require("mongoosastic")
+const Schema = mongoose.Schema
 
-const postSchema = mongoose.Schema(
+const postSchema = new Schema(
   {
     category: {
       type: String,
       required: true,
       enum: ["General", "Engineer", "Product", "Support"],
       default: "General"
+    },
+    title: {
+      type: String,
+      required: true
     },
     file: {
       type: String
@@ -59,9 +65,6 @@ const postSchema = mongoose.Schema(
   { timestamps: true }
 )
 
-/* search functionality */
-postSchema.index({ title: "text", description: "text" })
-
 /* delete all the comments */
 postSchema.pre("deleteOne", function (next) {
   const commentId = this.getQuery()["_id"]
@@ -78,6 +81,8 @@ postSchema.pre("deleteOne", function (next) {
   })
 })
 
+/* Partial search functionality */
+postSchema.plugin(mongoosastic)
 const Post = mongoose.model("Post", postSchema)
 
 module.exports = Post

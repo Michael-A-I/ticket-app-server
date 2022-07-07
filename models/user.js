@@ -6,6 +6,9 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true
     },
+    lastname: {
+      type: String
+    },
     email: {
       type: String,
       required: true
@@ -14,8 +17,10 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true
     },
-    image: String,
-    bio: String,
+    upload: { type: Boolean },
+    image: { type: String },
+    title: { type: String },
+    bio: { type: String },
     posts: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -63,3 +68,5 @@ module.exports = User
 /* delete users from db and recreate with posts/comments */
 
 /* when a object added to any of theses fields then notification should be sent with the object id.  */
+
+/* set up default image of user profile. */
