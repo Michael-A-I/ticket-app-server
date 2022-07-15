@@ -11,6 +11,14 @@ const User = require("../models/user")
 const Answers = require("../models/answers")
 const { resolveWatchPlugin } = require("jest-resolve")
 
+/* Algolia Searh */
+// hello_algolia.js
+const algoliasearch = require("algoliasearch")
+
+// Connect and authenticate with your Algolia app
+const client = algoliasearch("SJKC9QEQKE", "33d7716afe47f46cf5c640953ca00acb")
+/* Algolia Searh */
+
 router.post("/posts/new", verifyJWT, async (req, res) => {
   console.log("/posts/new")
 
@@ -66,6 +74,24 @@ router.get("/posts/index", verifyJWT, async (req, res) => {
   console.log(post)
   return res.json(post)
 })
+
+router.get("/posts/search", verifyJWT, async (req, res) => {
+  console.log("/posts/search")
+
+  try {
+    const post = await Post.find({}).select("-file").lean()
+    // Create a new index and add a record
+    const index = client.initIndex("posts")
+    const record = post
+
+    await index.replaceAllObjects(post, {
+      autoGenerateObjectIDIfNotExist: true
+    })
+  } catch (error) {
+    console.log(error)
+  }
+})
+
 router.get("/posts/support", verifyJWT, async (req, res) => {
   console.log("/posts/support")
   const post = await Post.find({ category: "Support" })
@@ -653,21 +679,21 @@ router.post("/posts/:post/answer/:comment", verifyJWT, async (req, res) => {
   res.json({ message: "Success" })
 })
 
-router.get("/posts/search/:search", verifyJWT, async (req, res) => {
-  console.log("search posts")
+// router.get("/posts/search/:search", verifyJWT, async (req, res) => {
+//   console.log("search posts")
 
-  const search = req.params.search
-  let regex = new RegExp(search, "i")
+//   const search = req.params.search
+//   let regex = new RegExp(search, "i")
 
-  const results = await Post.search({
-    query_string: {
-      query: "Hey"
-    }
-  })
+//   const results = await Post.search({
+//     query_string: {
+//       query: "Hey"
+//     }
+//   })
 
-  console.log(results)
+//   console.log(results)
 
-  res.json(results)
-})
+//   res.json(results)
+// })
 
 module.exports = router

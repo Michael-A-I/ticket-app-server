@@ -1,0 +1,226 @@
+require("dotenv").config()
+
+const router = require("express").Router()
+/* Login + Register*/
+
+const bcrypt = require("bcrypt")
+const User = require("../models/user")
+const jwt = require("jsonwebtoken")
+const verifyJWT = require("../verifyJWT")
+
+// hello_algolia.js
+const algoliasearch = require("algoliasearch")
+
+// Connect and authenticate with your Algolia app
+const client = algoliasearch("SJKC9QEQKE", "33d7716afe47f46cf5c640953ca00acb")
+
+router.get("/", (req, res) => {
+  console.log("home")
+  res.send("Home Page")
+})
+
+router.post("/register", async (req, res) => {
+  console.log("register")
+
+  const user = req.body
+
+  const takenUsername = await User.findOne({ username: user.username })
+  const takenEmail = await User.findOne({ email: user.email })
+
+  if (takenUsername || takenEmail) {
+    res.json({ message: "Username or email has already been taken" })
+    console.log("username or email taken")
+  } else {
+    user.password = await bcrypt.hash(req.body.password, 10)
+
+    const dbUser = new User({
+      username: user.username.toLowerCase(),
+      email: user.email.toLowerCase(),
+      password: user.password
+    })
+    dbUser.save()
+    res.json({ message: "Success" })
+  }
+
+  //! Index
+  /* Add a single object to index algolia serach */
+  //! Index
+})
+
+router.post("/login", (req, res) => {
+  console.log("login")
+
+  const userLoggingIn = req.body
+  /* find record of user */
+
+  // console.log("USERNAME " + req.body.username)
+
+  User.findOne({ username: userLoggingIn.username }).then(dbUser => {
+    // console.log(dbUser)
+    if (!dbUser) {
+      return res.json({
+        message: "invalid Username or Password"
+      })
+    }
+
+    bcrypt.compare(userLoggingIn.password, dbUser.password).then(isCorrect => {
+      // console.log("/login password correct?:" + isCorrect)
+      if (isCorrect) {
+        const payload = {
+          id: dbUser._id,
+          username: dbUser.username
+        }
+        jwt.sign(
+          payload,
+          process.env.JWT_SECRET,
+          {
+            expiresIn: 186400
+          },
+          (err, token) => {
+            // console.log("/login Server token set = " + token)
+            if (err) return res.json({ message: err })
+            return res.json({
+              message: "Success",
+              token: "Bearer " + token,
+              user: dbUser.username,
+              id: dbUser.id,
+              avatar: dbUser.image,
+              email: dbUser.email,
+              created: dbUser.createdAt
+            })
+          }
+        )
+      } else {
+        return res.json({
+          message: "invalid Username or Password"
+        })
+      }
+    })
+  })
+})
+
+/* dashboard */
+router.get("/dashboard", verifyJWT, (req, res) => {
+  console.log("dashboard")
+  res.send("dashboard")
+})
+
+/* If use is logged send back user information */
+
+router.get("/isUserAuth", verifyJWT, (req, res) => {
+  console.log("isUserAuth")
+
+  return res.json({ isLoggedIn: true, user: req.user })
+})
+
+router.get("/getUsername", verifyJWT, (req, res) => {
+  console.log("prxy")
+  res.json({ isLoggedIn: true, user: req.user.username })
+})
+
+router.get("/users", verifyJWT, async (req, res) => {
+  console.log("/users")
+  try {
+    const users = await User.find({}).select("-image").lean()
+    // Create a new index and add a record
+    const index = client.initIndex("users")
+    const record = users
+
+    await index.replaceAllObjects(users, {
+      autoGenerateObjectIDIfNotExist: true
+    })
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+router.get("/user", verifyJWT, async (req, res) => {
+  console.log("/user")
+  const userID = req.user.id
+  try {
+    // const user = await User.findById({ _id: userID }).select("-image").lean()
+
+    const user = await User.findById({ _id: userID }).lean()
+    console.log(user)
+    res.json(user)
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+router.put("/profile/edit", verifyJWT, async (req, res) => {
+  console.log("/profile/edit")
+
+  const userID = req.user.id
+  /* Find User */
+
+  const body = req.body
+  // console.log(id)
+  // console.log(body)
+  try {
+    const user = await User.findByIdAndUpdate({ _id: userID }, body, { new: true })
+
+    console.log(Array.isArray(user))
+
+    res.json({ message: "success" })
+  } catch (error) {
+    console.log("error" + error)
+  }
+
+  /* Send update object to user and save */
+  /* Return Success */
+})
+
+/* update avatar */
+router.put("/profile/updateavatar", verifyJWT, async (req, res) => {
+  console.log("/profile/updateavatar")
+
+  const userID = req.user.id
+  /* Find User */
+
+  const body = req.body
+  // console.log(id)
+  // console.log(body)
+  try {
+    const user = await User.findByIdAndUpdate({ _id: userID }, body, { new: true })
+
+    console.log(Array.isArray(user))
+
+    res.json({ message: "success" })
+  } catch (error) {
+    console.log("error" + error)
+  }
+
+  /* Send update object to user and save */
+  /* Return Success */
+})
+
+router.get("/userfeed", verifyJWT, async (req, res) => {
+  console.log("/userfeed")
+
+  const userID = req.user.id
+  /* Find User */
+
+  // const body = req.body
+  // console.log(id)
+  // console.log(body)
+  try {
+    // const user = await User.findById({ _id: userID }).select("-image").select("comments").populate("posts").populate("answers").populate("comments")
+    const user = await User.findById({ _id: userID }).select("comments answers posts").populate("comments answers posts")
+    console.log("=====================================")
+
+    const userfeed = user.posts.concat(user.comments, user.answers)
+
+    console.log(userfeed)
+
+    res.json(userfeed)
+  } catch (error) {
+    console.log("error" + error)
+  }
+
+  /* Send update object to user and save */
+  /* Return Success */
+})
+
+module.exports = router
+/* logging out handled on front end */

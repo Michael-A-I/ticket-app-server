@@ -18,7 +18,7 @@ const userSchema = mongoose.Schema(
       required: true
     },
     upload: { type: Boolean },
-    image: { type: String },
+    image: { type: String, default: "/default-profile.jpg" },
     title: { type: String },
     bio: { type: String },
     posts: [

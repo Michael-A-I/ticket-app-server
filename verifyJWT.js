@@ -19,11 +19,13 @@ function verifyJWT(req, res, next) {
         })
       }
       console.log(decoded)
+      /* attache properties to req object for use in routes */
       req.user = {}
       req.user.id = decoded.id
       req.user.username = decoded.username
       /*TODO: fix email is showing as undefiend */
       req.user.email = decoded.email
+      req.user.avatar = decoded.image
       next()
     })
   } else {
