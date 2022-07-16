@@ -21,8 +21,8 @@ app.use(express.json())
 const dbURI = process.env.URI
 /* routes */
 
-app.use("/", index)
-app.use("/", posts)
+app.use("/api/", index)
+app.use("/api/", posts)
 
 console.log(process.env.PORT_SERVER)
 /* Connect to MongDB database */
