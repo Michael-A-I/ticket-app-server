@@ -368,14 +368,12 @@ router.delete("/posts/:id", verifyJWT, async (req, res) => {
   try {
     /*TODO: if comments attached to post delete comments */
 
-    const post = Post.findById(id)
     // console.log(post)
-    const postDel = Post.deleteOne({ _id: id })
-
-    const [postRes, postDelRes] = Promise.all([post, postDel])
+    const postDel = await Post.deleteOne({ _id: id })
+    const posts = await Post.find({})
 
     console.log("post deleted")
-    return res.json(postRes)
+    return res.json(posts)
   } catch (error) {
     // console.log(error)
   }

@@ -47,16 +47,19 @@ router.post("/register", async (req, res) => {
   //! Index
 })
 
-router.post("/login", (req, res) => {
+router.post("/login", async (req, res) => {
   console.log("login")
 
   const userLoggingIn = req.body
   /* find record of user */
 
+  const username = userLoggingIn.username.toLowerCase()
+
   // console.log("USERNAME " + req.body.username)
 
-  User.findOne({ username: userLoggingIn.username }).then(dbUser => {
-    // console.log(dbUser)
+  User.findOne({ username: username }).then(dbUser => {
+    console.log(!dbUser)
+
     if (!dbUser) {
       return res.json({
         message: "invalid Username or Password"
@@ -100,11 +103,11 @@ router.post("/login", (req, res) => {
 })
 
 /* dashboard */
-router.get("/dashboard", verifyJWT, (req, res) => {
+/* router.get("/dashboard", verifyJWT, (req, res) => {
   console.log("dashboard")
   res.send("dashboard")
 })
-
+ */
 /* If use is logged send back user information */
 
 router.get("/isUserAuth", verifyJWT, (req, res) => {
