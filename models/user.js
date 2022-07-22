@@ -3,15 +3,23 @@ const mongoose = require("mongoose")
 const userSchema = mongoose.Schema(
   {
     username: {
+      type: String
+    },
+    firstName: {
       type: String,
       required: true
     },
-    lastname: {
-      type: String
+    lastName: {
+      type: String,
+      required: true
     },
     email: {
       type: String,
       required: true
+    },
+    confirmed: {
+      type: Boolean,
+      default: false
     },
     password: {
       type: String,
@@ -21,6 +29,12 @@ const userSchema = mongoose.Schema(
     image: { type: String, default: "/default-profile.jpg" },
     title: { type: String },
     bio: { type: String },
+    projects: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Projects"
+      }
+    ],
     posts: [
       {
         type: mongoose.Schema.Types.ObjectId,

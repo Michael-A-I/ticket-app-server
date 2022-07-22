@@ -9,6 +9,7 @@ const cors = require("cors")
 
 const index = require("./routes/index")
 const posts = require("./routes/posts")
+const email = require("./routes/email")
 
 const app = express()
 app.use(cors())
@@ -23,6 +24,12 @@ const dbURI = process.env.URI
 
 app.use("/api/", index)
 app.use("/api/", posts)
+
+/* keep heroku server from sleeping with uptime robot*/
+app.get("/wake-up", (req, res) => res.json("👌"))
+
+/* Email Verification */
+app.use("/api/email", email)
 
 console.log(process.env.PORT_SERVER)
 /* Connect to MongDB database */

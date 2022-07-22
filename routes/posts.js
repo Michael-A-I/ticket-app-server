@@ -27,7 +27,6 @@ router.post("/posts/new", verifyJWT, async (req, res) => {
   const userId = req.user.id
 
   console.table([
-    ["username", user.username],
     ["id", user.id],
     ["file ", post.file]
   ])
@@ -39,6 +38,8 @@ router.post("/posts/new", verifyJWT, async (req, res) => {
     description: post.description,
     user: user.id,
     name: user.username,
+    firstName: user.firstName,
+    lastName: user.lastName,
     numberOfLikes: 0,
     hasUserLiked: [],
     hasUserFollowed: [],
@@ -399,7 +400,9 @@ router.post("/posts/:id/comments", verifyJWT, async (req, res) => {
     post: id,
     postName: post.title,
     user: user.id,
-    name: user.username
+    name: user.username,
+    firstName: user.firstName,
+    lastName: user.lastName
   })
   dbComments.save()
   /* this creates relationsip between post and many comments */
@@ -559,6 +562,8 @@ router.post("/posts/:id/answers", verifyJWT, async (req, res) => {
     post: id,
     postName: post.title,
     user: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
     name: user.username,
     comments: []
   })
@@ -649,6 +654,8 @@ router.post("/posts/:post/answer/:comment", verifyJWT, async (req, res) => {
     postName: post.title,
     user: user.id,
     name: user.username,
+    firstName: user.firstName,
+    lastName: user.lastName,
     answer: commentID
   })
   await dbComments.save()

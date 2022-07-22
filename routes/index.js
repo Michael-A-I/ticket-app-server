@@ -7,6 +7,7 @@ const bcrypt = require("bcrypt")
 const User = require("../models/user")
 const jwt = require("jsonwebtoken")
 const verifyJWT = require("../verifyJWT")
+const msg = require("../helpers/email/msgs")
 
 // hello_algolia.js
 const algoliasearch = require("algoliasearch")
@@ -23,23 +24,31 @@ router.post("/register", async (req, res) => {
   console.log("register")
 
   const user = req.body
+  console.log(user)
 
-  const takenUsername = await User.findOne({ username: user.username })
+  // const takenUsername = await User.findOne({ username: user.username })
   const takenEmail = await User.findOne({ email: user.email })
 
-  if (takenUsername || takenEmail) {
-    res.json({ message: "Username or email has already been taken" })
-    console.log("username or email taken")
-  } else {
-    user.password = await bcrypt.hash(req.body.password, 10)
+  console.log(takenEmail)
 
-    const dbUser = new User({
-      username: user.username.toLowerCase(),
-      email: user.email.toLowerCase(),
-      password: user.password
-    })
-    dbUser.save()
-    res.json({ message: "Success" })
+  if (takenEmail) {
+    res.json({ message: msg.taken })
+  } else {
+    console.log("saving")
+    user.password = await bcrypt.hash(req.body.password, 10)
+    try {
+      const dbUser = new User({
+        email: user.email.toLowerCase(),
+        password: user.password,
+        firstName: user.firstName,
+        lastName: user.lastName
+      })
+      dbUser.save()
+      res.json({ message: "Success" })
+    } catch (error) {
+      console.log("error")
+      console.log(error)
+    }
   }
 
   //! Index
@@ -53,16 +62,24 @@ router.post("/login", async (req, res) => {
   const userLoggingIn = req.body
   /* find record of user */
 
-  const username = userLoggingIn.username.toLowerCase()
+  const email = userLoggingIn.email.toLowerCase()
+
+  console.log(email)
 
   // console.log("USERNAME " + req.body.username)
 
-  User.findOne({ username: username }).then(dbUser => {
+  User.findOne({ email: email }).then(dbUser => {
     console.log(!dbUser)
 
     if (!dbUser) {
       return res.json({
-        message: "invalid Username or Password"
+        message: msg.failed
+      })
+    }
+
+    if (!dbUser.confirmed) {
+      return res.json({
+        message: msg.resend
       })
     }
 
@@ -71,8 +88,10 @@ router.post("/login", async (req, res) => {
       if (isCorrect) {
         const payload = {
           id: dbUser._id,
-          username: dbUser.username
+          email: dbUser.email
         }
+
+        console.log(payload)
         jwt.sign(
           payload,
           process.env.JWT_SECRET,
@@ -85,7 +104,6 @@ router.post("/login", async (req, res) => {
             return res.json({
               message: "Success",
               token: "Bearer " + token,
-              user: dbUser.username,
               id: dbUser.id,
               avatar: dbUser.image,
               email: dbUser.email,
