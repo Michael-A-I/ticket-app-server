@@ -10,7 +10,7 @@ module.exports = {
   confirm: id => ({
     subject: "React Confirm Email",
     html: `
-      <a href='${process.env.CLIENT_ORIGIN_DEV}api/email/confirm/${id}'>
+      <a href='${process.env.CLIENT_ORIGIN_DEV}api/email/confirmed/${id}'>
         click to confirm email
       </a>
     `,
@@ -19,7 +19,7 @@ module.exports = {
   confirm_production: id => ({
     subject: "React Confirm Email",
     html: `
-      <a href='${process.env.CLIENT_ORIGIN}api/email/confirm/${id}'>
+      <a href='${process.env.CLIENT_ORIGIN}api/email/confirmed/${id}'>
         click to confirm email
       </a>
     `,

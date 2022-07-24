@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 const Post = require("../models/post")
 const Comments = require("../models/comments")
-const verifyJWT = require("../verifyJWT")
+cons = require(".")
 const User = require("../models/user")
 const Answers = require("../models/answers")
 const { resolveWatchPlugin } = require("jest-resolve")
@@ -19,7 +19,7 @@ const algoliasearch = require("algoliasearch")
 const client = algoliasearch("SJKC9QEQKE", "33d7716afe47f46cf5c640953ca00acb")
 /* Algolia Searh */
 
-router.post("/posts/new", verifyJWT, async (req, res) => {
+router.post("/posts/new", async (req, res) => {
   console.log("/posts/new")
 
   const post = req.body
@@ -66,7 +66,7 @@ router.post("/posts/new", verifyJWT, async (req, res) => {
   })
 })
 
-router.get("/posts/index", verifyJWT, async (req, res) => {
+router.get("/posts/index", async (req, res) => {
   console.log("/posts/index")
 
   /* Speed increase due to not loading image and using lean */
@@ -76,7 +76,7 @@ router.get("/posts/index", verifyJWT, async (req, res) => {
   return res.json(post)
 })
 
-router.get("/posts/search", verifyJWT, async (req, res) => {
+router.get("/posts/search", async (req, res) => {
   console.log("/posts/search")
 
   try {
@@ -93,7 +93,7 @@ router.get("/posts/search", verifyJWT, async (req, res) => {
   }
 })
 
-router.get("/posts/support", verifyJWT, async (req, res) => {
+router.get("/posts/support", async (req, res) => {
   console.log("/posts/support")
   const post = await Post.find({ category: "Support" })
 
@@ -101,28 +101,28 @@ router.get("/posts/support", verifyJWT, async (req, res) => {
   return res.json(post)
 })
 /* filters */
-router.get("/posts/product", verifyJWT, async (req, res) => {
+router.get("/posts/product", async (req, res) => {
   console.log("/posts/product")
   const post = await Post.find({ category: "Product" })
 
   // console.log(res.json)
   return res.json(post)
 })
-router.get("/posts/general", verifyJWT, async (req, res) => {
+router.get("/posts/general", async (req, res) => {
   console.log("/posts/general")
   const post = await Post.find({ category: "General" })
 
   // console.log(res.json)
   return res.json(post)
 })
-router.get("/posts/engineer", verifyJWT, async (req, res) => {
+router.get("/posts/engineer", async (req, res) => {
   console.log("/posts/engineer")
   const post = await Post.find({ category: "Engineer" })
 
   return res.json(post)
 })
 
-router.get("/posts/:id", verifyJWT, async (req, res) => {
+router.get("/posts/:id", async (req, res) => {
   console.log("/posts/:id")
 
   let paramsId = req.params.id
@@ -135,7 +135,7 @@ router.get("/posts/:id", verifyJWT, async (req, res) => {
 })
 
 /*! Update Post */
-router.put("/posts/:id", verifyJWT, async (req, res) => {
+router.put("/posts/:id", async (req, res) => {
   console.log("/posts/:id")
   const id = req.params.id
   const body = req.body
@@ -158,7 +158,7 @@ router.put("/posts/:id", verifyJWT, async (req, res) => {
   } */
 })
 
-router.put("/posts/:id/edit", verifyJWT, async (req, res) => {
+router.put("/posts/:id/edit", async (req, res) => {
   console.log("/posts/:id/edit")
   const id = req.params.id
   const body = req.body
@@ -182,7 +182,7 @@ router.put("/posts/:id/edit", verifyJWT, async (req, res) => {
 })
 
 /* Update Post Likes */
-router.put("/posts/:id/like", verifyJWT, async (req, res) => {
+router.put("/posts/:id/like", async (req, res) => {
   console.log("/posts/:id/like")
   const id = req.params.id
   const body = req.body
@@ -212,7 +212,7 @@ router.put("/posts/:id/like", verifyJWT, async (req, res) => {
 /* unlike */
 
 /* BL */
-router.put("/posts/:id/unlike", verifyJWT, async (req, res) => {
+router.put("/posts/:id/unlike", async (req, res) => {
   console.log("/posts/:id/unlike")
   const id = req.params.id
   const body = req.body
@@ -242,7 +242,7 @@ router.put("/posts/:id/unlike", verifyJWT, async (req, res) => {
 
 /* has user liked? */
 
-router.get("/posts/:id/hasUserLiked", verifyJWT, async (req, res) => {
+router.get("/posts/:id/hasUserLiked", async (req, res) => {
   console.log("/posts/:id/hasUserLiked")
   const userID = req.user.id
   const id = req.params.id
@@ -269,7 +269,7 @@ router.get("/posts/:id/hasUserLiked", verifyJWT, async (req, res) => {
 
 /* Follow Post */
 /* BLOCKING */
-router.post("/posts/:id/follow", verifyJWT, async (req, res) => {
+router.post("/posts/:id/follow", async (req, res) => {
   console.log("/posts/:id/follow")
   const id = req.params.id
   const body = req.body
@@ -311,7 +311,7 @@ router.post("/posts/:id/follow", verifyJWT, async (req, res) => {
 })
 /* Unfollow Post */
 /* Blocks */
-router.put("/posts/:id/unfollow", verifyJWT, async (req, res) => {
+router.put("/posts/:id/unfollow", async (req, res) => {
   console.log("/posts/:id/unfollow")
   const id = req.params.id
   const userIdFromBody = req.body
@@ -340,7 +340,7 @@ router.put("/posts/:id/unfollow", verifyJWT, async (req, res) => {
   }
 })
 /* get if user had followed */
-router.get("/posts/:id/followcheck", verifyJWT, async (req, res) => {
+router.get("/posts/:id/followcheck", async (req, res) => {
   console.log("/posts/:id/followcheck")
 
   const id = req.params.id
@@ -362,7 +362,7 @@ router.get("/posts/:id/followcheck", verifyJWT, async (req, res) => {
 
 /* Delete Post */
 /* BLOCKING */
-router.delete("/posts/:id", verifyJWT, async (req, res) => {
+router.delete("/posts/:id", async (req, res) => {
   console.log("/posts/:id")
   let id = req.params.id
 
@@ -382,7 +382,7 @@ router.delete("/posts/:id", verifyJWT, async (req, res) => {
 
 /* Post Comment */
 
-router.post("/posts/:id/comments", verifyJWT, async (req, res) => {
+router.post("/posts/:id/comments", async (req, res) => {
   console.time("getUploadRead")
 
   console.log("/posts/:id/comments")
@@ -431,7 +431,7 @@ router.post("/posts/:id/comments", verifyJWT, async (req, res) => {
 })
 
 /* GET Comment */
-router.get("/posts/:id/comments", verifyJWT, async (req, res) => {
+router.get("/posts/:id/comments", async (req, res) => {
   console.time("GET /posts/:id/comments")
   console.log("/posts/:id/comments")
   let id = req.params.id
@@ -455,7 +455,7 @@ router.get("/posts/:id/comments", verifyJWT, async (req, res) => {
 
 /* Delete Comment */
 /* BLOCKING */
-router.delete("/posts/:id/comments", verifyJWT, async (req, res) => {
+router.delete("/posts/:id/comments", async (req, res) => {
   console.time("delete /posts/:id/comments")
 
   console.log("/posts/:id/comments")
@@ -475,7 +475,7 @@ router.delete("/posts/:id/comments", verifyJWT, async (req, res) => {
 })
 
 /* Edit Comment */
-router.put("/posts/:id/comments", verifyJWT, async (req, res) => {
+router.put("/posts/:id/comments", async (req, res) => {
   console.log("/posts/:id/comments")
   const id = req.params.id
   const body = req.body
@@ -496,7 +496,7 @@ router.put("/posts/:id/comments", verifyJWT, async (req, res) => {
   }
 })
 
-router.get("/posts/:user/following", verifyJWT, async (req, res) => {
+router.get("/posts/:user/following", async (req, res) => {
   console.log("/posts/:user/following")
   const id = req.params.user
 
@@ -507,7 +507,7 @@ router.get("/posts/:user/following", verifyJWT, async (req, res) => {
 /* Answers */
 
 /* Get Answers */
-router.get("/posts/:id/answers", verifyJWT, async (req, res) => {
+router.get("/posts/:id/answers", async (req, res) => {
   console.log("GET /posts/:id/answers")
   const id = req.params.id
 
@@ -527,7 +527,7 @@ router.get("/posts/:id/answers", verifyJWT, async (req, res) => {
 })
 /* Get Answers */
 
-router.get("/posts/answers/:id", verifyJWT, async (req, res) => {
+router.get("/posts/answers/:id", async (req, res) => {
   console.log("GET /posts/answers/:id")
   const id = req.params.id
 
@@ -544,7 +544,7 @@ router.get("/posts/answers/:id", verifyJWT, async (req, res) => {
 
 /* Post Answers */
 // BLOCKING
-router.post("/posts/:id/answers", verifyJWT, async (req, res) => {
+router.post("/posts/:id/answers", async (req, res) => {
   console.log("POST /posts/:id/answers")
   /* Post Answer to Database */
   const id = req.params.id
@@ -597,7 +597,7 @@ router.post("/posts/:id/answers", verifyJWT, async (req, res) => {
 
 /* Delete Answers */
 
-router.delete("/posts/:id/answers/delete", verifyJWT, async (req, res) => {
+router.delete("/posts/:id/answers/delete", async (req, res) => {
   console.log("/posts/:id/answers/delete")
   const answerID = req.params.id
 
@@ -610,7 +610,7 @@ router.delete("/posts/:id/answers/delete", verifyJWT, async (req, res) => {
 
 /* Edit Answer */
 
-router.put("/posts/:id/answers/edit", verifyJWT, async (req, res) => {
+router.put("/posts/:id/answers/edit", async (req, res) => {
   console.log("/posts/:id/answers/edit")
 
   // const answer = await Answers.findByIdAndDelete(answerID)
@@ -637,7 +637,7 @@ router.put("/posts/:id/answers/edit", verifyJWT, async (req, res) => {
 
 /* Answer Comments */
 /* BLOCKING */
-router.post("/posts/:post/answer/:comment", verifyJWT, async (req, res) => {
+router.post("/posts/:post/answer/:comment", async (req, res) => {
   console.log("/posts/:post/answer/:comment")
   const postID = req.params.post
   const commentID = req.params.comment
@@ -684,7 +684,7 @@ router.post("/posts/:post/answer/:comment", verifyJWT, async (req, res) => {
   res.json({ message: "Success" })
 })
 
-// router.get("/posts/search/:search", verifyJWT, async (req, res) => {
+// router.get("/posts/search/:search", async (req, res) => {
 //   console.log("search posts")
 
 //   const search = req.params.search

@@ -4,11 +4,11 @@ const router = require("express").Router()
 /* Login + Register*/
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
-const Post = require("../models/post")
-const Comments = require("../models/comments")
-const verifyJWT = require("../verifyJWT")
-const User = require("../models/user")
-const Answers = require("../models/answers")
+const Post = require("../../models/post")
+const Comments = require("../../models/comments")
+const verifyJWT = require("../../verifyJWT")
+const User = require("../../models/user")
+const Answers = require("../../models/answers")
 const { resolveWatchPlugin } = require("jest-resolve")
 
 router.post("/posts/new", verifyJWT, async (req, res) => {

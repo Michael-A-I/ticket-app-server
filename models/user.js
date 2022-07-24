@@ -17,14 +17,6 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true
     },
-    confirmed: {
-      type: Boolean,
-      default: false
-    },
-    password: {
-      type: String,
-      required: true
-    },
     upload: { type: Boolean },
     image: { type: String, default: "/default-profile.jpg" },
     title: { type: String },

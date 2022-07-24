@@ -35,9 +35,12 @@ router.post("/register", async (req, res) => {
   if (takenEmail) {
     res.json({ message: msg.taken })
   } else {
+    console.log("saving")
+    user.password = await bcrypt.hash(req.body.password, 10)
     try {
       const dbUser = new User({
         email: user.email.toLowerCase(),
+        username: user,
         firstName: user.firstName,
         lastName: user.lastName
       })
@@ -48,6 +51,75 @@ router.post("/register", async (req, res) => {
       console.log(error)
     }
   }
+
+  //! Index
+  /* Add a single object to index algolia serach */
+  //! Index
+})
+
+router.post("/login", async (req, res) => {
+  console.log("login")
+
+  const userLoggingIn = req.body
+  /* find record of user */
+
+  const email = userLoggingIn.email.toLowerCase()
+
+  console.log(email)
+
+  // console.log("USERNAME " + req.body.username)
+
+  User.findOne({ email: email }).then(dbUser => {
+    console.log(!dbUser)
+
+    if (!dbUser) {
+      return res.json({
+        message: msg.failed
+      })
+    }
+
+    /* Allow Email Functionality */
+    // if (!dbUser.confirmed) {
+    //   return res.json({
+    //     message: msg.resend
+    //   })
+    // }
+
+    bcrypt.compare(userLoggingIn.password, dbUser.password).then(isCorrect => {
+      // console.log("/login password correct?:" + isCorrect)
+      if (isCorrect) {
+        const payload = {
+          id: dbUser._id,
+          email: dbUser.email
+        }
+
+        console.log(payload)
+        jwt.sign(
+          payload,
+          process.env.JWT_SECRET,
+          {
+            expiresIn: 186400
+          },
+          (err, token) => {
+            // console.log("/login Server token set = " + token)
+            if (err) return res.json({ message: err })
+            return res.json({
+              message: "Success",
+              token: "Bearer " + token,
+              id: dbUser.id,
+              avatar: dbUser.image,
+              email: dbUser.email,
+              created: dbUser.createdAt
+            })
+          }
+        )
+      } else {
+        return res.json({
+          message: "invalid Username or Password"
+        })
+      }
+    })
+  })
 })
 
 /* dashboard */
