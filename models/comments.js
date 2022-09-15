@@ -6,11 +6,15 @@ const commentSchema = mongoose.Schema(
       type: String,
       required: true
     },
-    post: {
+    project: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Post"
+      ref: "Projects"
     },
-    postName: {
+    ticket: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Tickets"
+    },
+    projectName: {
       type: String
     },
     user: {
@@ -18,6 +22,12 @@ const commentSchema = mongoose.Schema(
       ref: "User"
     },
     name: {
+      type: String
+    },
+    firstName: {
+      type: String
+    },
+    lastName: {
       type: String
     },
     answer: {

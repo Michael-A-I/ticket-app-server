@@ -2,8 +2,28 @@ const mongoose = require("mongoose")
 
 const userSchema = mongoose.Schema(
   {
+    userId: { type: Number },
+    role: {
+      type: String,
+      enum: ["owner", "administrator", "manager", "member", "support", "unassigned"],
+      required: true,
+      default: "unassigned"
+    },
+    createdTickets: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Tickets"
+      }
+    ],
+    myTickets: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Tickets"
+      }
+    ],
     username: {
-      type: String
+      type: String,
+      required: true
     },
     firstName: {
       type: String,

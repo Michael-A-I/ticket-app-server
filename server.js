@@ -7,9 +7,15 @@ const path = require("path")
 const mongoose = require("mongoose")
 const cors = require("cors")
 
+// const addId = require("./middleware/addId")
+
 const index = require("./routes/index")
 const posts = require("./routes/posts")
 const email = require("./routes/email")
+const projects = require("./routes/projects")
+const tickets = require("./routes/tickets")
+const dashboard = require("./routes/dashboard")
+const instaSearch = require("./routes/instaSearch")
 
 const app = express()
 app.use(cors())
@@ -22,8 +28,12 @@ app.use(express.json())
 const dbURI = process.env.URI
 /* routes */
 
+app.use("/api/search", instaSearch)
+app.use("/api/", dashboard)
 app.use("/api/", index)
 app.use("/api/", posts)
+app.use("/api/", projects)
+app.use("/api/", tickets)
 
 /* keep heroku server from sleeping with uptime robot*/
 app.get("/wake-up", (req, res) => res.json("👌"))

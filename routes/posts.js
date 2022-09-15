@@ -6,9 +6,9 @@ const jwt = require("jsonwebtoken")
 const bcrypt = require("bcrypt")
 const Post = require("../models/post")
 const Comments = require("../models/comments")
-cons = require(".")
 const User = require("../models/user")
 const Answers = require("../models/answers")
+
 const { resolveWatchPlugin } = require("jest-resolve")
 
 /* Algolia Searh */
@@ -26,10 +26,10 @@ router.post("/posts/new", async (req, res) => {
   const user = req.user
   const userId = req.user.id
 
-  console.table([
-    ["id", user.id],
-    ["file ", post.file]
-  ])
+  // console.table([
+  //   ["id", user.id],
+  //   ["file ", post.file]
+  // ])
 
   console.log("USERNAME TYPEOF " + typeof user.username)
 
@@ -162,8 +162,8 @@ router.put("/posts/:id/edit", async (req, res) => {
   console.log("/posts/:id/edit")
   const id = req.params.id
   const body = req.body
-  console.log(id)
-  console.log(body)
+  // console.log(id)
+  // console.log(body)
   try {
     await Post.findByIdAndUpdate({ _id: id }, body, { new: true })
 
@@ -187,8 +187,8 @@ router.put("/posts/:id/like", async (req, res) => {
   const id = req.params.id
   const body = req.body
   const userId = req.user.id
-  console.log(body)
-  console.log(id)
+  // console.log(body)
+  // console.log(id)
 
   try {
     /* increment # of likes */
@@ -271,6 +271,7 @@ router.get("/posts/:id/hasUserLiked", async (req, res) => {
 /* BLOCKING */
 router.post("/posts/:id/follow", async (req, res) => {
   console.log("/posts/:id/follow")
+
   const id = req.params.id
   const body = req.body
   const hasUserFollowed = req.body.hasUserFollowed
@@ -353,7 +354,7 @@ router.get("/posts/:id/followcheck", async (req, res) => {
     /* post.hasUserFollowed is array of user ids */
 
     const isUserFollowing = post.hasUserFollowed.includes(req.user.id)
-    console.log("is user following" + isUserFollowing)
+    // console.log("is user following" + isUserFollowing)
     res.json(isUserFollowing)
   } catch (error) {
     console.log(error)
@@ -392,7 +393,7 @@ router.post("/posts/:id/comments", async (req, res) => {
   const userId = user.id
 
   const post = await Post.findById(id).select("title").lean()
-  console.log(post)
+  // console.log(post)
 
   /* creates relationshipt between single comment and the single post */
   const dbComments = new Comments({
