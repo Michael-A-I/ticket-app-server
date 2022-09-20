@@ -6,7 +6,11 @@ const router = require("express").Router()
 
 const bcrypt = require("bcrypt")
 const User = require("../models/user")
+
+// Userfront token verification.
 const jwt = require("jsonwebtoken")
+const publicKey = process.env.PUBLICKEY
+
 const msg = require("../helpers/email/msgs")
 
 // hello_algolia.js
@@ -18,20 +22,19 @@ const client = algoliasearch("SJKC9QEQKE", "33d7716afe47f46cf5c640953ca00acb")
 const assignUser = require("../middleware/assignUser")
 router.use(assignUser)
 
-const isAuthenticated = require("../middleware/isAuthenticated")
+const { isProtected, isAdmin } = require("../middleware/isAuthenticated")
+const { accessSync } = require("fs-extra")
 
-router.get("/", isAuthenticated, (req, res) => {
+router.get("/", (req, res) => {
   res.send("sdfasdf")
 })
 
-router.get("/login/:email", isAuthenticated, (req, res) => {
+router.get("/login/test", isAdmin, (req, res) => {
   console.log("home")
-  return
-  const email = req.params.email
-  const id = req.id
-  const user = User.findOne({ email })
-  console.log({ id })
-  return
+  // console.log({ cookie: access.pn4qd8qb })
+  // console.log({ c })
+
+  res.send("test")
 })
 
 router.post("/register", async (req, res) => {
@@ -131,7 +134,7 @@ router.put("/user/:id", async (req, res) => {
 })
 
 /* delete user */
-router.delete("/user/:id", async (req, res) => {
+router.delete("/user/:id", isProtected, isAdmin, async (req, res) => {
   try {
     console.log("delete /user/:id")
     const id = req.params.id

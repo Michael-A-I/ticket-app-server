@@ -1,14 +1,135 @@
-const router = require("express").Router()
-const mongoose = require("mongoose")
-const Users = require("../models/user")
+// Example with Node.js
+var jose = require("node-jose")
+var jwt = require("jsonwebtoken")
 
-const isAuthenticated = async (req, res, next) => {
-  console.log("isAuthenticated")
-  const users = await Users.find({})
-  console.log("asdfasdfasdfasdfasdf" + users)
-  console.log(req.params.email)
+const isAdmin = async (req, res, next) => {
+  console.log("MIDDLEWARE")
+  const payload = await getPayload(req)
 
-  next()
+  if (!payload) {
+    return
+  }
+  if (payload.includes("admin")) {
+    console.log("user has access")
+    next()
+  } else {
+    console.log("user does not have access")
+    return "user does not have access"
+  }
 }
 
-module.exports = isAuthenticated
+const isOwner = async (req, res, next) => {
+  console.log("MIDDLEWARE")
+  const payload = await getPayload(req)
+
+  if (!payload) {
+    return
+  }
+  if (payload.includes("owner")) {
+    console.log("user has access")
+    next()
+  } else {
+    console.log("user does not have access")
+    return "user does not have access"
+  }
+}
+
+const isManager = async (req, res, next) => {
+  console.log("MIDDLEWARE")
+  const payload = await getPayload(req)
+
+  if (!payload) {
+    return
+  }
+  if (payload.includes("manager")) {
+    console.log("user has access")
+    next()
+  } else {
+    console.log("user does not have access")
+    return "user does not have access"
+  }
+}
+
+const isMember = async (req, res, next) => {
+  console.log("MIDDLEWARE")
+  const payload = await getPayload(req)
+
+  if (!payload) {
+    return
+  }
+  if (payload.includes("member")) {
+    console.log("user has access")
+    next()
+  } else {
+    console.log("user does not have access")
+    return "user does not have access"
+  }
+}
+
+const isSupport = async (req, res, next) => {
+  console.log("MIDDLEWARE")
+  const payload = await getPayload(req)
+
+  if (!payload) {
+    return
+  }
+  if (payload.includes("support")) {
+    console.log("user has access")
+    next()
+  } else {
+    console.log("user does not have access")
+    return "user does not have access"
+  }
+}
+
+const isProtected = async (req, res, next) => {
+  console.log("isProtected")
+  const payload = await getPayload(req)
+
+  console.log({ payload })
+
+  if (!payload) {
+    console.log("user not logged in")
+    return
+  }
+  if (payload) {
+    console.log("user logged in")
+    next()
+  }
+}
+
+const getPayload = async req => {
+  let cookie = req.cookies["access.pn4qd8qb"]
+  const JWKS = await getJWKS()
+
+  // !revision on how to work with multiple keys
+  const keystore = await jose.JWK.asKey(JWKS[0]).then(function (result) {
+    return result
+  })
+
+  const { payload } = await jose.JWS.createVerify(keystore)
+    .verify(cookie, { allowEmbeddedKey: true })
+    .then(function (cookieResult) {
+      return cookieResult
+    })
+
+  const rolesJSON = JSON.parse(payload.toString("utf-8"))
+
+  return rolesJSON.authorization["pn4qd8qb"].roles
+}
+
+const getJWKS = async () => {
+  const response = await fetch(`https://api.userfront.com/v0/tenants/pn4qd8qb/jwks?test=true`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer uf_test_admin_pn4qd8qb_716f06f96e75339e20560eff39515269"
+    }
+  })
+
+  const JWKS = await response.json()
+
+  return JWKS.keys
+}
+
+module.exports = { isAdmin, isProtected, isOwner, isManager, isMember, isSupport }

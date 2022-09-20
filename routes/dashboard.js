@@ -11,6 +11,8 @@ const { resolveWatchPlugin } = require("jest-resolve")
 
 // Models
 const Projects = require("../models/projects")
+// Authorization Middleware
+const { isProtected, isAdmin } = require("../middleware/isAuthenticated")
 
 const addId = (req, res, next) => {
   // Defining middleware
@@ -19,7 +21,7 @@ const addId = (req, res, next) => {
   next()
 }
 
-router.get("/dashboard/index", addId, async (req, res) => {
+router.get("/dashboard/index", async (req, res) => {
   console.log("/posts/index")
   console.log(req.id)
   /* Speed increase due to not loading image and using lean */
