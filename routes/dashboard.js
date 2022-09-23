@@ -69,25 +69,8 @@ router.get("/dashboard/bugsandfeatures/:email", async (req, res) => {
     // ! on live server users is coming up as null
 
     console.log({ users })
-    const priority = [0, 0, 0, 0]
 
-    users.myTickets.forEach(user => {
-      if (user.priority == "low") {
-        console.log((priority[0] += 1))
-      }
-      if (user.priority == "medium") {
-        console.log((priority[1] += 1))
-      }
-      if (user.priority == "high") {
-        console.log((priority[2] += 1))
-      }
-      if (user.priority == "none") {
-        console.log((priority[3] += 1))
-      }
-    })
-
-    console.log(priority)
-    return res.json(priority)
+    return res.json(users)
   } catch (error) {
     console.log(error)
   }
@@ -102,25 +85,7 @@ router.get("/dashboard/ticketstatus/:email", async (req, res) => {
     /* Speed increase due to not loading image and using lean */
     const users = await Users.findOne({ email }).populate("myTickets")
 
-    const status = [0, 0, 0, 0]
-
-    users.myTickets.forEach(user => {
-      if (user.status == "new") {
-        console.log((status[0] += 1))
-      }
-      if (user.status == "inprogress") {
-        console.log((status[1] += 1))
-      }
-      if (user.status == "completed") {
-        console.log((status[2] += 1))
-      }
-      if (user.status == "additional") {
-        console.log((status[3] += 1))
-      }
-    })
-
-    console.log(status)
-    return res.json(status)
+    return res.json(users)
   } catch (error) {
     console.log(error)
   }
