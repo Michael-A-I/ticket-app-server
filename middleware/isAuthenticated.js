@@ -118,7 +118,12 @@ const getPayload = async req => {
 
   console.log({ rolesJSON })
 
-  return rolesJSON.authorization["pn4qd8qb"].roles
+  if (!rolesJSON.authorization["pn4qd8qb"].roles) {
+    return console.log("no roles for user - user is unassigned")
+  }
+  if (rolesJSON.authorization["pn4qd8qb"].roles) {
+    return rolesJSON.authorization["pn4qd8qb"].roles
+  }
 }
 
 const getJWKS = async cookie => {
