@@ -6,6 +6,7 @@ const isAdmin = async (req, res, next) => {
   console.log("MIDDLEWARE")
   const payload = await getPayload(req)
   console.log({ payload })
+
   if (!payload) {
     return
   }
@@ -99,8 +100,10 @@ const isProtected = async (req, res, next) => {
 }
 
 const getPayload = async req => {
-  let cookie = req.cookies["access.pn4qd8qb"]
+  const cookie = req.cookies["access.pn4qd8qb"]
   const JWKS = await getJWKS()
+
+  console.log({ cookie })
 
   // !revision on how to work with multiple keys
   const keystore = await jose.JWK.asKey(JWKS[0]).then(function (result) {
