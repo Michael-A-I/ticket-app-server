@@ -101,9 +101,7 @@ const isProtected = async (req, res, next) => {
 
 const getPayload = async req => {
   const cookie = req.cookies["access.pn4qd8qb"]
-  const JWKS = await getJWKS()
-
-  console.log({ cookie })
+  const JWKS = await getJWKS(cookie)
 
   // !revision on how to work with multiple keys
   const keystore = await jose.JWK.asKey(JWKS[0]).then(function (result) {
@@ -121,12 +119,14 @@ const getPayload = async req => {
   return rolesJSON.authorization["pn4qd8qb"].roles
 }
 
-const getJWKS = async () => {
+const getJWKS = async cookie => {
+  console.log({ cookie })
+
   const response = await fetch(`https://api.userfront.com/v0/tenants/pn4qd8qb/jwks`, {
     method: "GET",
     headers: {
-      "Content-Type": "application/json"
-      // Authorization: `Bearer ${cookie} `
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${cookie} `
     }
   })
 
