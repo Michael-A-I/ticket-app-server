@@ -116,23 +116,28 @@ const getPayload = async req => {
 
   const rolesJSON = JSON.parse(payload.toString("utf-8"))
 
+  console.log({ rolesJSON })
+
   return rolesJSON.authorization["pn4qd8qb"].roles
 }
 
 const getJWKS = async cookie => {
   console.log({ cookie })
+  try {
+    const response = await fetch(`https://api.userfront.com/v0/tenants/pn4qd8qb/jwks`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cookie} `
+      }
+    })
 
-  const response = await fetch(`https://api.userfront.com/v0/tenants/pn4qd8qb/jwks`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${cookie} `
-    }
-  })
+    const JWKS = await response.json()
 
-  const JWKS = await response.json()
-
-  return JWKS.keys
+    return JWKS.keys
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 module.exports = { isAdmin, isProtected, isOwner, isManager, isMember, isSupport }
