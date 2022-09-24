@@ -1,6 +1,8 @@
 require("dotenv").config()
 
 const router = require("express").Router()
+const fetch = require("node-fetch")
+
 /* Login + Register*/
 // const addId = require("../middleware/addId")
 
