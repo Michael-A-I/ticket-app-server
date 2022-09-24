@@ -1,7 +1,7 @@
 // Example with Node.js
 var jose = require("node-jose")
 var jwt = require("jsonwebtoken")
-
+import fetch from "node-fetch"
 const isAdmin = async (req, res, next) => {
   console.log("MIDDLEWARE")
   const payload = await getPayload(req)
