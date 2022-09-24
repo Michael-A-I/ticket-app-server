@@ -8,14 +8,18 @@ const isAdmin = async (req, res, next) => {
   console.log({ payload })
 
   if (!payload) {
-    return
+    console.log("user is unassigned")
+
+    return res.json({ err: "user is unassigned" })
   }
   if (payload.includes("admin")) {
-    console.log("user has access")
+    console.log("user has  access > middleware - next")
+
+    res.json({ msg: "Success" })
     next()
   } else {
     console.log("user does not have access")
-    return "user does not have access"
+    return res.json({ err: "user does not have access" })
   }
 }
 
@@ -117,17 +121,19 @@ const getPayload = async req => {
   const rolesJSON = JSON.parse(payload.toString("utf-8"))
 
   console.log({ rolesJSON })
-
-  if (!rolesJSON.authorization["pn4qd8qb"].roles) {
-    return console.log("no roles for user - user is unassigned")
-  }
-  if (rolesJSON.authorization["pn4qd8qb"].roles) {
-    return rolesJSON.authorization["pn4qd8qb"].roles
+  if (rolesJSON.authorization["pn4qd8qb"]) {
+    if (!rolesJSON.authorization["pn4qd8qb"].roles) {
+      return console.log("no roles for user - user is unassigned")
+    }
+    if (rolesJSON.authorization["pn4qd8qb"].roles) {
+      return rolesJSON.authorization["pn4qd8qb"].roles
+    }
   }
 }
 
 const getJWKS = async cookie => {
   console.log({ cookie })
+
   try {
     const response = await fetch(`https://api.userfront.com/v0/tenants/pn4qd8qb/jwks`, {
       method: "GET",
@@ -138,7 +144,7 @@ const getJWKS = async cookie => {
     })
 
     const JWKS = await response.json()
-
+    console.log({ JWKS })
     return JWKS.keys
   } catch (error) {
     console.log(error)
