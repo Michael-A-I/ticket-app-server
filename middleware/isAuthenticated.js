@@ -5,7 +5,7 @@ var jwt = require("jsonwebtoken")
 const isAdmin = async (req, res, next) => {
   console.log("MIDDLEWARE")
   const payload = await getPayload(req)
-
+  console.log({ payload })
   if (!payload) {
     return
   }
@@ -118,15 +118,12 @@ const getPayload = async req => {
   return rolesJSON.authorization["pn4qd8qb"].roles
 }
 
-/* live key */
-const key = "uf_live_admin_pn4qd8qb_695b575ea5a763cced22aa5168839a25"
-
 const getJWKS = async () => {
-  const response = await fetch(`https://api.userfront.com/v0/tenants/pn4qd8qb/jwks?test=true`, {
+  const response = await fetch(`https://api.userfront.com/v0/tenants/pn4qd8qb/jwks`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: "Bearer uf_test_admin_pn4qd8qb_716f06f96e75339e20560eff39515269"
+      Authorization: `Bearer ${cookie} `
     }
   })
 

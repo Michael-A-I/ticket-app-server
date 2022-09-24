@@ -120,7 +120,7 @@ router.get("/usersIndex", async (req, res) => {
 })
 
 /* edit user */
-router.put("/user/:id", async (req, res) => {
+router.put("/user/:id", isAdmin, async (req, res) => {
   console.log("/user/:id")
   const id = req.params.id
   const body = req.body
@@ -135,16 +135,16 @@ router.put("/user/:id", async (req, res) => {
 })
 
 // Update user in USERFRONT.js
-router.put("/user/userfront/:id", async (req, res) => {
+router.put("/user/userfront/:id", isAdmin, async (req, res) => {
   console.log("/user/userfront/:id")
   const id = req.params.id
   const body = req.body
-
+  let cookie = req.cookies["access.pn4qd8qb"]
   console.log({ id })
   console.log({ body })
   const payload = body[0]
   const roles = body[1]
-
+  console.log({ roles })
   // try {
   //   const response = await fetch(`https://api.userfront.com/v0/users/${id}/`, {
   //     method: "PUT",
@@ -165,7 +165,7 @@ router.put("/user/userfront/:id", async (req, res) => {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer uf_test_admin_pn4qd8qb_716f06f96e75339e20560eff39515269"
+        Authorization: `Bearer ${cookie}`
       },
       body: JSON.stringify(payload)
     })
@@ -179,7 +179,7 @@ router.put("/user/userfront/:id", async (req, res) => {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer uf_test_admin_pn4qd8qb_716f06f96e75339e20560eff39515269"
+        Authorization: `Bearer ${cookie}`
       },
       body: JSON.stringify(roles)
     })
