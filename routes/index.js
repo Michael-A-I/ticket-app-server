@@ -24,6 +24,7 @@ router.use(assignUser)
 
 const { isProtected, isAdmin } = require("../middleware/isAuthenticated")
 const { accessSync } = require("fs-extra")
+const { resolveContent } = require("nodemailer/lib/shared")
 
 router.get("/", (req, res) => {
   res.send("sdfasdf")
@@ -128,6 +129,61 @@ router.put("/user/:id", async (req, res) => {
     const user = await User.findByIdAndUpdate({ _id: id }, body, { new: true })
 
     return res.json(user)
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+// Update user in USERFRONT.js
+router.put("/user/userfront/:id", async (req, res) => {
+  console.log("/user/userfront/:id")
+  const id = req.params.id
+  const body = req.body
+
+  console.log({ id })
+  console.log({ body })
+  const payload = body[0]
+  const roles = body[1]
+
+  // try {
+  //   const response = await fetch(`https://api.userfront.com/v0/users/${id}/`, {
+  //     method: "PUT",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       Authorization: "Bearer uf_test_admin_pn4qd8qb_716f06f96e75339e20560eff39515269"
+  //     },
+  //     body: JSON.stringify(body)
+  //   })
+  //   console.log(await response.json())
+  //   // return await response.json()
+  // } catch (error) {
+  //   console.log(error)
+  // }
+
+  try {
+    const response = await fetch(`https://api.userfront.com/v0/users/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer uf_test_admin_pn4qd8qb_716f06f96e75339e20560eff39515269"
+      },
+      body: JSON.stringify(payload)
+    })
+    console.log(await response.json())
+  } catch (error) {
+    console.log(error)
+  }
+
+  try {
+    const response = await fetch(`https://api.userfront.com/v0/users/${id}/roles`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer uf_test_admin_pn4qd8qb_716f06f96e75339e20560eff39515269"
+      },
+      body: JSON.stringify(roles)
+    })
+    console.log(await response.json())
   } catch (error) {
     console.log(error)
   }
