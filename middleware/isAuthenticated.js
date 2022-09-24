@@ -125,8 +125,8 @@ const getJWKS = async () => {
   const response = await fetch(`https://api.userfront.com/v0/tenants/pn4qd8qb/jwks`, {
     method: "GET",
     headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${cookie} `
+      "Content-Type": "application/json"
+      // Authorization: `Bearer ${cookie} `
     }
   })
 
