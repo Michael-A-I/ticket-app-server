@@ -38,58 +38,67 @@ router.get("/projects/:id", async (req, res) => {
 //create project
 router.post("/projects/new", async (req, res) => {
   console.log("/projects/new")
+  try {
+    const project = req.body
+    const email = req.body.email
+    const user = await User.findOne({})
+    console.log({ email })
 
-  const project = req.body
-  const email = req.body.email
-  const user = await User.findOne({ email: email })
-  const id = user._id.toString()
+    console.log({ user })
 
-  // console.log(project)
-  // console.log(id)
-  // console.log({ project })
+    const id = user._id.toString()
+    // console.log(project)
+    // console.log(id)
+    // console.log({ project })
 
-  // console.table([
-  //   ["id", user.id],
-  //   ["file ", project.file]
-  // ])
+    // console.table([
+    //   ["id", user.id],
+    //   ["file ", project.file]
+    // ])
 
-  const dbProject = new Projects({
-    title: project.title,
-    description: project.description,
-    createdBy: id,
-    assigned: id,
-    name: user.username,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    numberOfLikes: 0,
-    hasUserLiked: [],
-    hasUserFollowed: [],
-    file: project.file,
-    category: project.category
-  })
+    const dbProject = new Projects({
+      title: project.title,
+      description: project.description,
+      createdBy: id,
+      assigned: id,
+      name: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      numberOfLikes: 0,
+      hasUserLiked: [],
+      hasUserFollowed: [],
+      file: project.file,
+      category: project.category
+    })
 
-  // console.log({ dbProject })
+    // console.log({ dbProject })
 
-  dbProject.save(function (err, project) {
-    if (project) {
-      res.json({ message: "Success", _id: project.id })
-    } else {
-      console.log(err)
-    }
-  })
+    dbProject.save(function (err, project) {
+      if (project) {
+        res.json({ msg: "Success", _id: project.id })
+      } else {
+        console.log(err)
+        res.json({ err: err.message })
+      }
+    })
 
-  // !UPDATE
-  // projects related to tieckts
-  /* sets posts on USER model */
+    // !UPDATE
+    // projects related to tieckts
+    /* sets posts on USER model */
 
-  user.projects.push(dbProject)
+    user.projects.push(dbProject)
 
-  /* save to db */
-  user.save(function (err) {
-    if (err) {
-      console.log(err)
-    }
-  })
+    /* save to db */
+    user.save(function (err) {
+      if (err) {
+        console.log(err)
+        res.json({ err: err.message })
+      }
+    })
+  } catch (error) {
+    console.log(error)
+    res.json({ err: error.message })
+  }
 })
 
 // edit project
