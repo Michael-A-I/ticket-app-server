@@ -28,7 +28,7 @@ router.get("/projects", async (req, res) => {
 router.get("/projects/:id", async (req, res) => {
   const id = req.params.id
   // console.log({ id })
-  const project = await Projects.findById({ _id: id }).populate("comments").populate("answers")
+  const project = await Projects.findById({ _id: id }).populate("comments").populate("answers").populate("assigned").populate("createdBy")
 
   // console.log({ project })
 

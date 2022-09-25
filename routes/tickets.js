@@ -50,6 +50,9 @@ router.post("/projects/:id/tickets/new", async (req, res) => {
   const createTicketUser = await User.findOne({ email: email })
   const assignedTicketUser = await User.findById({ _id: ticket.assigned })
   const project = await Projects.findById({ _id: projectId })
+  console.log({ createTicketUser })
+  console.log({ email })
+
   const id = createTicketUser._id.toString()
 
   // console.log(project)
@@ -76,14 +79,17 @@ router.post("/projects/:id/tickets/new", async (req, res) => {
   // console.log({ dbTicket })
   // console.log({ project })
   // console.log({ projectId })
-
-  dbTicket.save(function (err, project) {
-    if (project) {
-      res.json({ message: "Success", _id: project.id })
-    } else {
-      console.log(err)
-    }
-  })
+  try {
+    dbTicket.save(function (err, project) {
+      if (project) {
+        res.json({ msg: "Success", _id: project.id })
+      } else {
+        console.log(err)
+      }
+    })
+  } catch (error) {
+    res.json({ err: error })
+  }
 
   // should be saved to assined user if unassigned then return
 
