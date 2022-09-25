@@ -229,10 +229,9 @@ router.get("/projects/ticket/:id/comments", async (req, res) => {
 router.get("/projects/myticket/:id", async (req, res) => {
   console.log("get mytickets")
   const id = req.params.id
-  console.log(id)
+  console.log({ id })
   try {
     const { myTickets } = await User.findById(id).populate({ path: "myTickets", populate: [{ path: "createdBy" }, { path: "assigned" }] })
-    // { path: "tickets", populate: [{ path: "createdBy" }, { path: "assigned" }] }
     console.log({ myTickets })
 
     res.json(myTickets)
