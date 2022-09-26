@@ -38,13 +38,13 @@ app.use("/api/", projects)
 app.use("/api/", tickets)
 
 /* keep heroku server from sleeping with uptime robot*/
-setInterval(
-  app.get("/wake-up", (req, res) => {
-    console.log("server got coffee")
-    res.json("👌")
-  }),
-  300000
-)
+// setInterval(
+//   app.get("/wake-up", (req, res) => {
+//     console.log("server got coffee")
+//     res.json("👌")
+//   }),
+//   300000
+// )
 
 /* Email Verification */
 app.use("/api/email", email)
