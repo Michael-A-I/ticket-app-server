@@ -63,7 +63,11 @@ const projectsSchema = new Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: "Tickets"
       }
-    ]
+    ],
+    archived: {
+      type: Boolean,
+      default: false
+    }
   },
 
   { timestamps: true }

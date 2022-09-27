@@ -7,6 +7,8 @@ const bcrypt = require("bcrypt")
 const Comments = require("../models/comments")
 const User = require("../models/user")
 const Answers = require("../models/answers")
+const Uuid = require("../models/uuid")
+
 const { resolveWatchPlugin } = require("jest-resolve")
 
 // Models
@@ -41,7 +43,27 @@ router.post("/projects/new", async (req, res) => {
   try {
     const project = req.body
     const email = req.body.email
-    const user = await User.findOne({})
+    const formUuid = await Uuid.findOne({ uuid: project.uuid })
+
+    if (formUuid) {
+      res.json({ err: "form already submitted" })
+      return
+    }
+    const formId = new Uuid({
+      uuid: project.uuid
+    })
+
+    formId.save(function (err, uuid) {
+      if (uuid) {
+        console.log({ uuid })
+      } else {
+        console.log(err)
+        res.json({ err: err.message })
+      }
+    })
+
+    const user = await User.findOne({ email })
+
     console.log({ email })
 
     console.log({ user })
@@ -103,14 +125,40 @@ router.post("/projects/new", async (req, res) => {
 
 // edit project
 router.put("/projects/:id", async (req, res) => {
+  console.log("/projects/:id")
   try {
     const id = req.params.id
 
     const body = req.body
+    console.log(req.body)
+
     const project = await Projects.findByIdAndUpdate({ _id: id }, body, { new: true })
-    // console.log({ body, id, project })
+
+    res.json({ msg: "Success" })
   } catch (error) {
     console.log(error)
+    res.json({ err: error })
+  }
+})
+
+//archive
+router.put("/projects/:id/archived", async (req, res) => {
+  console.log("/projects/:id")
+  try {
+    const id = req.params.id
+
+    const body = req.body
+    console.log(req.body)
+
+    const project = await Projects.findByIdAndUpdate({ _id: id }, body, { new: true })
+    project.tickets.push("d")
+    console.log({ project })
+
+    return
+    res.json({ msg: "Success" })
+  } catch (error) {
+    console.log(error)
+    res.json({ err: error })
   }
 })
 
@@ -193,4 +241,5 @@ router.get("/project/:id/comments", async (req, res) => {
 
   res.json(comments)
 })
+
 module.exports = router

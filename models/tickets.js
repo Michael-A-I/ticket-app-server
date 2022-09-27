@@ -64,6 +64,10 @@ const ticketsSchema = new Schema(
       required: true,
       enum: ["none", "low", "medium", "high"],
       default: "none"
+    },
+    archived: {
+      type: Boolean,
+      default: false
     }
   },
   { timestamps: true }
