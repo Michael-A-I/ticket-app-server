@@ -8,7 +8,7 @@ const Comments = require("../models/comments")
 const User = require("../models/user")
 const Answers = require("../models/answers")
 const Uuid = require("../models/uuid")
-
+const Tickets = require("../models/tickets")
 const { resolveWatchPlugin } = require("jest-resolve")
 
 // Models
@@ -148,13 +148,16 @@ router.put("/projects/:id/archived", async (req, res) => {
     const id = req.params.id
 
     const body = req.body
-    console.log(req.body)
-
+    body.done = true
+    console.log({ body })
     const project = await Projects.findByIdAndUpdate({ _id: id }, body, { new: true })
-    project.tickets.push("d")
-    console.log({ project })
+    const tickets = await Tickets.updateMany({ project: id }, { $set: { done: true } })
+    console.log({ tickets })
 
     return
+
+    /* set all tickets to done as well*/
+    /*  */
     res.json({ msg: "Success" })
   } catch (error) {
     console.log(error)

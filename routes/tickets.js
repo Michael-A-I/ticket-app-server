@@ -20,7 +20,7 @@ router.get("/projects/tickets/:id", async (req, res) => {
 
   try {
     const { tickets } = await Projects.findById(id).populate({ path: "tickets", populate: [{ path: "createdBy" }, { path: "assigned" }] })
-    // console.log(tickets)
+    console.log(tickets)
 
     res.json(tickets)
   } catch (error) {
